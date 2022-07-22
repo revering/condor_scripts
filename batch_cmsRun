@@ -1,0 +1,59 @@
+#!/bin/sh
+
+SCRAM_ARCH=$1
+RELSPACE=$2
+WORKSPACE=$3
+FILE=$4
+STARTDIR=$(pwd)
+echo ${STARTDIR} 
+if [ $# -gt "4" ]
+then
+    LOG=$5
+else
+    LOG=${FILE%%.cfg}.log
+fi
+
+if [ $# -gt "5" ]
+then
+    ELOG=$6
+else
+    ELOG=${FILE%%.cfg}.elog
+fi
+
+if [ $# -gt "6" ]
+then
+    /bin/rm -f $7
+fi
+
+if [ $# -gt "7" ]
+then
+    sleep $8
+fi
+
+CMSRUN_ARGUMENTS=""
+for var in "${@:9}"
+do
+     CMSRUN_ARGUMENTS="${CMSRUN_ARGUMENTS} $var"
+done
+
+mkdir -p ${WORKSPACE} 
+cd ${WORKSPACE}
+/bin/hostname 
+echo "INSIDE batch_cmsRun" 
+echo ${RELSPACE} 
+echo ${CMSRUN_ARGUMENTS} 
+pwd 
+# This version uses the locally installed versions of CMSSW
+#source /local/cms/sw/cmsset_${SCRAM_ARCH}.sh >> ${LOG} 2>> ${ELOG}
+# This version uses the remotely mounted drives at CERN
+#echo "TESTING" >> ${LOG}
+#set >> ${LOG}
+cd ${RELSPACE}
+#echo ======================== >> ${LOG}
+#scram runtime -sh >> ${LOG} 2>>${ELOG}
+#echo ======================== >> ${LOG}
+eval 'cmsenv' 
+#echo ======================== >> ${LOG}
+#set >> ${LOG}
+cd ${STARTDIR}
+cmsRun ${FILE} ${CMSRUN_ARGUMENTS} 
